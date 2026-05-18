@@ -243,9 +243,9 @@ class HexMazeGame {
     const ny = this.player.y + dy;
     const { CELL } = MazeGenerator;
 
-    if (nx < 0 || nx >= this.maze.width || ny < 0 || ny >= this.maze.height) return;
+    if (nx < 0 || nx >= this.maze.width || ny < 0 || ny >= this.maze.height) { SFX.wall(); return; }
     const targetCell = this.maze.grid[ny][nx];
-    if (targetCell === CELL.WALL) return;
+    if (targetCell === CELL.WALL) { SFX.wall(); return; }
 
     // Move
     this.maze.grid[this.player.y][this.player.x] = CELL.PATH;
@@ -258,20 +258,26 @@ class HexMazeGame {
       case CELL.KEY:
         this.keysCollected++;
         this.score += 50;
+        SFX.key();
         break;
       case CELL.TRAP:
         this.timeLeft = Math.max(0, this.timeLeft - 5);
         this.score = Math.max(0, this.score - 20);
+        SFX.trap();
         break;
       case CELL.TELEPORTER:
         this.handleTeleport(nx, ny);
+        SFX.teleport();
         break;
       case CELL.EXIT:
         if (this.keysCollected >= this.maze.config.keys) {
+          SFX.complete();
           this.levelComplete();
           return;
         }
         break;
+      default:
+        SFX.move();
     }
 
     // Check enemy collision
@@ -330,10 +336,32 @@ class HexMazeGame {
     document.getElementById('complete-score').textContent = `+${levelScore}`;
     document.getElementById('complete-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(3 - stars);
     this.showScreen('complete-screen');
+
+    // Submit to leaderboard
+    this.submitScore();
+  }
+
+  async submitScore() {
+    const name = localStorage.getItem('hexmaze_name') || 'Anonim';
+    try {
+      await fetch('/api/score', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          score: this.score,
+          level: this.level,
+          moves: this.moves,
+          durationMs: (this.maze.config.timer - this.timeLeft) * 1000,
+          mode: 'classic',
+        }),
+      });
+    } catch (e) { /* silent */ }
   }
 
   gameOver(reason) {
     this.state = 'gameover';
+    SFX.gameover();
     clearInterval(this.timerInterval);
     clearInterval(this.enemyInterval);
     document.getElementById('gameover-reason').textContent = reason;
@@ -474,6 +502,7 @@ class HexMazeGame {
     const el = document.getElementById('hud-timer');
     el.textContent = this.formatTime(this.timeLeft);
     el.style.color = this.timeLeft <= 10 ? '#ff4757' : this.timeLeft <= 30 ? '#ffd700' : '#ff4757';
+    if (this.timeLeft <= 10 && this.timeLeft > 0) SFX.tick();
   }
 
   formatTime(seconds) {

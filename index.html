@@ -18,6 +18,7 @@
         <button id="btn-play" class="btn-primary">▶ PLAY</button>
         <button id="btn-continue" class="btn-secondary" style="display:none">↻ CONTINUE</button>
         <button id="btn-levels" class="btn-secondary">📋 LEVELS</button>
+        <button id="btn-leaderboard" class="btn-secondary">🏆 LEADERBOARD</button>
       </div>
       <div class="menu-stats">
         <span id="menu-highest">Highest: Level 1</span>
@@ -100,9 +101,28 @@
       <button id="btn-menu" class="btn-secondary">MENU</button>
     </div>
   </div>
+
+  <!-- Leaderboard Screen -->
+  <div id="leaderboard-screen" class="screen">
+    <div class="leaderboard-container">
+      <h2>🏆 LEADERBOARD</h2>
+      <div class="lb-tabs">
+        <button id="lb-tab-classic" class="lb-tab active">Classic</button>
+        <button id="lb-tab-daily" class="lb-tab">Daily</button>
+      </div>
+      <div id="lb-list" class="lb-list">
+        <p class="lb-loading">Loading...</p>
+      </div>
+      <button id="btn-lb-back" class="btn-secondary">← BACK</button>
+    </div>
+  </div>
+
+  <!-- Sound toggle -->
+  <button id="btn-sound" class="sound-toggle">🔊</button>
 </div>
 
 <script src="src/maze.js"></script>
+<script src="src/sfx.js"></script>
 <script src="src/game.js"></script>
 <script src="src/main.js"></script>
 </body>

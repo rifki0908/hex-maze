@@ -157,4 +157,59 @@
 
   // Init
   updateMenuStats();
+
+  // Ask for player name if not set
+  if (!localStorage.getItem('hexmaze_name')) {
+    const name = prompt('Enter your name for the leaderboard:') || 'Anonim';
+    localStorage.setItem('hexmaze_name', name.slice(0, 20));
+  }
+
+  // Leaderboard
+  let lbMode = 'classic';
+
+  async function loadLeaderboard(mode) {
+    lbMode = mode;
+    document.querySelectorAll('.lb-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById(`lb-tab-${mode}`).classList.add('active');
+    const list = document.getElementById('lb-list');
+    list.innerHTML = '<p class="lb-loading">Loading...</p>';
+
+    try {
+      const res = await fetch(`/api/score?mode=${mode}`);
+      const data = await res.json();
+      if (!data.scores || data.scores.length === 0) {
+        list.innerHTML = '<p class="lb-empty">No scores yet. Be the first!</p>';
+        return;
+      }
+      list.innerHTML = data.scores.map((s, i) => {
+        const rankClass = i === 0 ? 'top1' : i === 1 ? 'top2' : i === 2 ? 'top3' : '';
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`;
+        return `<div class="lb-row">
+          <span class="lb-rank ${rankClass}">${medal}</span>
+          <span class="lb-name">${s.name}</span>
+          <span class="lb-level">Lv.${s.level || '?'}</span>
+          <span class="lb-score">⭐${s.score}</span>
+        </div>`;
+      }).join('');
+    } catch (e) {
+      list.innerHTML = '<p class="lb-empty">Failed to load. Try again later.</p>';
+    }
+  }
+
+  document.getElementById('btn-leaderboard').addEventListener('click', () => {
+    showScreen('leaderboard-screen');
+    loadLeaderboard('classic');
+  });
+  document.getElementById('lb-tab-classic').addEventListener('click', () => loadLeaderboard('classic'));
+  document.getElementById('lb-tab-daily').addEventListener('click', () => loadLeaderboard('daily'));
+  document.getElementById('btn-lb-back').addEventListener('click', () => {
+    updateMenuStats();
+    showScreen('menu-screen');
+  });
+
+  // Sound toggle
+  document.getElementById('btn-sound').addEventListener('click', () => {
+    const on = SFX.toggle();
+    document.getElementById('btn-sound').textContent = on ? '🔊' : '🔇';
+  });
 })();
