@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Hex Maze</title>
+<link rel="stylesheet" href="src/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌀</text></svg>">
+</head>
+<body>
+<div id="app">
+  <!-- Menu Screen -->
+  <div id="menu-screen" class="screen active">
+    <div class="menu-container">
+      <h1 class="game-title">HEX<span>MAZE</span></h1>
+      <p class="subtitle">Navigate. Survive. Escape.</p>
+      <div class="menu-buttons">
+        <button id="btn-play" class="btn-primary">▶ PLAY</button>
+        <button id="btn-continue" class="btn-secondary" style="display:none">↻ CONTINUE</button>
+        <button id="btn-levels" class="btn-secondary">📋 LEVELS</button>
+      </div>
+      <div class="menu-stats">
+        <span id="menu-highest">Highest: Level 1</span>
+        <span id="menu-stars">⭐ 0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Screen -->
+  <div id="game-screen" class="screen">
+    <!-- HUD -->
+    <div id="hud">
+      <div class="hud-left">
+        <div class="level-badge" id="hud-level">Level 1</div>
+        <div class="tier-name" id="hud-tier">Tier 1: Rookie</div>
+      </div>
+      <div class="hud-center">
+        <div class="timer" id="hud-timer">02:00</div>
+      </div>
+      <div class="hud-right">
+        <span class="keys" id="hud-keys">🔑 0/0</span>
+        <span class="moves" id="hud-moves">👣 0</span>
+        <span class="score" id="hud-score">⭐ 0</span>
+      </div>
+    </div>
+
+    <!-- Game Canvas -->
+    <canvas id="game-canvas"></canvas>
+
+    <!-- Touch Controls (mobile) -->
+    <div id="touch-controls">
+      <button class="touch-btn" data-dir="up">↑</button>
+      <button class="touch-btn" data-dir="left">←</button>
+      <button class="touch-btn" data-dir="right">→</button>
+      <button class="touch-btn" data-dir="down">↓</button>
+    </div>
+
+    <!-- Pause overlay -->
+    <div id="pause-overlay" class="overlay hidden">
+      <div class="overlay-box">
+        <h2>PAUSED</h2>
+        <button id="btn-resume" class="btn-primary">▶ RESUME</button>
+        <button id="btn-quit" class="btn-secondary">✕ QUIT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Level Complete Screen -->
+  <div id="complete-screen" class="screen">
+    <div class="overlay-box">
+      <h2 id="complete-title">LEVEL COMPLETE!</h2>
+      <div class="complete-stats">
+        <div class="stat-row"><span>Time</span><span id="complete-time">--</span></div>
+        <div class="stat-row"><span>Moves</span><span id="complete-moves">--</span></div>
+        <div class="stat-row"><span>Score</span><span id="complete-score">--</span></div>
+        <div class="stat-row stars"><span id="complete-stars">⭐⭐⭐</span></div>
+      </div>
+      <button id="btn-next" class="btn-primary">NEXT LEVEL →</button>
+    </div>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="gameover-screen" class="screen">
+    <div class="overlay-box gameover">
+      <h2>GAME OVER</h2>
+      <p id="gameover-reason">Time's up!</p>
+      <button id="btn-retry" class="btn-primary">↻ RETRY</button>
+      <button id="btn-menu" class="btn-secondary">MENU</button>
+    </div>
+  </div>
+</div>
+
+<script src="src/maze.js"></script>
+<script src="src/game.js"></script>
+<script src="src/main.js"></script>
+</body>
+</html>
