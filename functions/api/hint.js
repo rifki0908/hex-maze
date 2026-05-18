@@ -52,7 +52,7 @@ Give a SHORT hint (max 2 sentences) about which direction to go next. Be helpful
         'Authorization': `Bearer ${env.MIMO_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'mimo-v2.5-pro',
+        model: 'mimo-v2.5',
         messages: [
           { role: 'system', content: 'You are MiMo, a fun and helpful maze game assistant. Keep responses short, playful, and useful. Max 2 sentences.' },
           { role: 'user', content: prompt }

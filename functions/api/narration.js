@@ -45,12 +45,12 @@ Write a SHORT atmospheric narration (2-3 sentences max) welcoming them to this n
         'Authorization': `Bearer ${env.MIMO_API_KEY}`,
       },
       body: JSON.stringify({
-        model: 'mimo-v2.5-pro',
+        model: 'mimo-v2.5',
         messages: [
           { role: 'system', content: 'You are a dark fantasy narrator. Write atmospheric, concise game narrations. Max 3 sentences. No markdown formatting.' },
           { role: 'user', content: prompt }
         ],
-        max_completion_tokens: 120,
+        max_completion_tokens: 150,
         temperature: 0.9,
         stream: false,
       }),
@@ -61,7 +61,7 @@ Write a SHORT atmospheric narration (2-3 sentences max) welcoming them to this n
 
     return new Response(JSON.stringify({ narration, tier, level }), { status: 200, headers });
   } catch (err) {
-    return new Response(JSON.stringify({ narration: `You have entered ${tier || 'unknown territory'}. Tread carefully.`, tier, level: 0 }), { status: 200, headers });
+    return new Response(JSON.stringify({ narration: `You have entered ${tier || 'unknown territory'}. Tread carefully.`, tier, level: 0, debug: err.message }), { status: 200, headers });
   }
 }
 
