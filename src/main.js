@@ -66,6 +66,9 @@
     showScreen('menu-screen');
   });
 
+  // Event: Hint button
+  document.getElementById('btn-hint').addEventListener('click', () => game.requestHint());
+
   // Keyboard input
   document.addEventListener('keydown', (e) => {
     switch (e.key) {
@@ -98,6 +101,10 @@
       case 'P':
         if (game.state === 'playing') game.pause();
         else if (game.state === 'paused') game.resume();
+        break;
+      case 'h':
+      case 'H':
+        game.requestHint();
         break;
     }
   });

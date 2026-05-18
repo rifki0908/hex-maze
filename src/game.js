@@ -23,6 +23,10 @@ class HexMazeGame {
     this.animFrame = null;
     this.highestLevel = parseInt(localStorage.getItem('hexmaze_highest') || '1');
     this.totalScore = parseInt(localStorage.getItem('hexmaze_score') || '0');
+    this.hintsUsed = 0;
+    this.maxHints = 3;
+    this.currentTier = null;
+    this.hintCooldown = false;
 
     this.resize();
     window.addEventListener('resize', () => this.resize());
@@ -56,17 +60,117 @@ class HexMazeGame {
     this.level = level;
     this.moves = 0;
     this.keysCollected = 0;
+    this.hintsUsed = 0;
+    this.hintCooldown = false;
     this.maze = MazeGenerator.generate(level);
     this.player = { ...this.maze.playerPos };
     this.enemies = this.maze.enemyPositions.map(e => ({ ...e }));
     this.timeLeft = this.maze.config.timer;
     this.state = 'playing';
 
+    // Check tier change for narration
+    const newTier = this.maze.config.tier;
+    if (!this.currentTier || this.currentTier.name !== newTier.name) {
+      this.currentTier = newTier;
+      this.fetchNarration(newTier.name, level);
+    }
+
     this.calculateLayout();
     this.startTimer();
     this.startEnemies();
     this.updateHUD();
     this.render();
+  }
+
+  // AI Hint System
+  async requestHint() {
+    if (this.state !== 'playing') return;
+    if (this.hintCooldown) return;
+    if (this.hintsUsed >= this.maxHints) {
+      this.showToast('No hints left!');
+      return;
+    }
+
+    this.hintCooldown = true;
+    this.hintsUsed++;
+    this.score = Math.max(0, this.score - 100); // Hint costs 100 points
+    this.updateHUD();
+
+    const hintBtn = document.getElementById('btn-hint');
+    if (hintBtn) hintBtn.textContent = '💡 Loading...';
+
+    try {
+      const keysLeft = this.maze.config.keys - this.keysCollected;
+      const response = await fetch('/api/hint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          grid: this.maze.grid,
+          playerPos: this.player,
+          exitPos: this.maze.exitPos,
+          keysLeft,
+          level: this.level,
+        }),
+      });
+      const data = await response.json();
+      this.showToast(data.hint || 'Try a different direction!', 5000);
+    } catch (err) {
+      this.showToast('Try exploring paths you haven\'t visited!', 3000);
+    }
+
+    if (hintBtn) hintBtn.textContent = `💡 Hint (${this.maxHints - this.hintsUsed})`;
+    setTimeout(() => { this.hintCooldown = false; }, 3000);
+  }
+
+  // AI Narration System
+  async fetchNarration(tierName, level) {
+    try {
+      const response = await fetch('/api/narration', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tier: tierName, level }),
+      });
+      const data = await response.json();
+      if (data.narration) {
+        this.showNarration(tierName, data.narration);
+      }
+    } catch (err) {
+      // Fallback narration
+      this.showNarration(tierName, `Welcome to ${tierName}. The maze grows deeper...`);
+    }
+  }
+
+  showNarration(tierName, text) {
+    const overlay = document.getElementById('narration-overlay');
+    const title = document.getElementById('narration-title');
+    const content = document.getElementById('narration-text');
+    if (!overlay) return;
+
+    title.textContent = `⚡ ${tierName}`;
+    content.textContent = text;
+    overlay.classList.remove('hidden');
+
+    // Auto-dismiss after 5s or on click
+    const dismiss = () => {
+      overlay.classList.add('hidden');
+      overlay.removeEventListener('click', dismiss);
+    };
+    overlay.addEventListener('click', dismiss);
+    setTimeout(dismiss, 5000);
+  }
+
+  showToast(message, duration = 3000) {
+    let toast = document.getElementById('game-toast');
+    if (!toast) {
+      toast = document.createElement('div');
+      toast.id = 'game-toast';
+      toast.style.cssText = 'position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.9);border:1px solid #00d4ff;color:#fff;padding:12px 24px;border-radius:10px;font-size:14px;z-index:100;max-width:80%;text-align:center;transition:opacity 0.3s;';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = message;
+    toast.style.opacity = '1';
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => { toast.style.opacity = '0'; }, duration);
   }
 
   startTimer() {

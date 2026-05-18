@@ -140,3 +140,38 @@ body {
   .hud-right { gap: 8px; font-size: 11px; }
   .timer { font-size: 20px; }
 }
+
+/* Hint button */
+.hint-btn {
+  position: absolute; top: 60px; right: 16px; z-index: 15;
+  background: rgba(255,215,0,0.15); border: 1px solid rgba(255,215,0,0.4);
+  color: #ffd700; padding: 8px 16px; border-radius: 8px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: all 0.2s;
+}
+.hint-btn:hover { background: rgba(255,215,0,0.25); transform: scale(1.05); }
+.hint-btn:active { transform: scale(0.95); }
+
+/* Narration overlay */
+.narration-box {
+  background: linear-gradient(135deg, rgba(10,10,40,0.95), rgba(20,10,50,0.95));
+  border: 1px solid rgba(168,85,247,0.4); border-radius: 16px;
+  padding: 32px 40px; text-align: center; max-width: 420px;
+  box-shadow: 0 0 40px rgba(168,85,247,0.2);
+  animation: narrationIn 0.5s ease-out;
+}
+@keyframes narrationIn {
+  from { opacity: 0; transform: scale(0.9) translateY(20px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.narration-box h2 {
+  color: #a855f7; font-size: 22px; margin-bottom: 12px;
+  text-shadow: 0 0 15px rgba(168,85,247,0.5);
+}
+.narration-box p {
+  color: #ccc; font-size: 15px; line-height: 1.6;
+  font-style: italic; margin-bottom: 16px;
+}
+.narration-dismiss {
+  color: #555; font-size: 11px; letter-spacing: 1px;
+}
